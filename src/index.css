@@ -1,0 +1,61 @@
+/* ============ 全域樣式 ============ */
+:root {
+  --paper: #fdfaf4;
+  --cream: #f7f0e3;
+  --ivory: #efe5d2;
+  --line: #e6d8c0;
+  --caramel: #a8744a;
+  --cocoa: #6b3e22;
+  --ink: #2d1a10;
+  --brick: #a64232;
+  --brick-dark: #7d2e22;
+  --muted: #8a7560;
+  --soft-muted: #b8a790;
+  --mint: #8aa890;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.serif { font-family: 'Georgia', 'Noto Serif TC', serif; }
+.sans { font-family: 'Inter', 'Noto Sans TC', sans-serif; }
+.script { font-family: 'Brush Script MT', 'Lucida Handwriting', cursive; font-style: italic; }
+
+input, textarea, select, button { font-family: inherit; outline: none; }
+input:focus, textarea:focus, select:focus { border-color: var(--caramel) !important; }
+
+.pcard { transition: box-shadow 0.25s ease, transform 0.25s ease; }
+.pcard:hover { box-shadow: 0 8px 24px rgba(45,26,16,0.1); transform: translateY(-2px); }
+
+.btn-primary:hover { background: var(--ink) !important; }
+.btn-ghost:hover { background: rgba(139,90,60,0.08) !important; }
+.qty-btn { transition: background 0.15s ease; }
+.qty-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1) !important; }
+.cart-qty-btn:hover:not(:disabled) { background: var(--ivory) !important; }
+.qty-btn:disabled, .cart-qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.remove-btn:hover { color: var(--brick) !important; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #d4b896; border-radius: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+#root {
+  min-height: 100vh;
+}
+
+.app-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--paper);
+}
+
+@media (max-width: 768px) {
+  .app-container { box-shadow: none; }
+}
