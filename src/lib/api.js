@@ -72,32 +72,125 @@ export async function fetchOrders() {
   return (data || []).map(mapOrder)
 }
 
+/**
+ * 自訂錯誤類別:讓前端可以分辨「庫存不足」vs「其他系統錯誤」
+ */
+export class OrderError extends Error {
+  constructor(code, friendlyMessage, originalError) {
+    super(friendlyMessage)
+    this.code = code              // 'STOCK_INSUFFICIENT' | 'NETWORK' | 'UNKNOWN'
+    this.friendlyMessage = friendlyMessage
+    this.originalError = originalError
+  }
+}
+
+/**
+ * 建立訂單 - 使用資料庫的 create_order_safe 函式
+ * 
+ * 為什麼這樣寫?
+ * 1. 訂單編號由 PostgreSQL SEQUENCE 產生,絕對不會重複
+ * 2. 庫存檢查、寫入訂單、扣庫存 → 全部在資料庫一個 transaction 完成,失敗會自動 rollback
+ * 3. 即使顧客 A B 同時下單,資料庫的 SEQUENCE 也會給不同編號
+ * 4. 撞號的話資料庫會自動重試 5 次
+ */
 export async function createOrder(orderData) {
-  const { count } = await supabase.from('orders').select('*', { count: 'exact', head: true })
-  const orderNo = '#' + String((count || 0) + 1).padStart(4, '0')
-  
-  const payload = {
-    id: 'ORD' + Date.now(),
-    order_no: orderNo,
-    customer_name: orderData.name,
-    customer_phone: orderData.phone,
-    pickup_date: orderData.pickupDate,
-    pickup_location: orderData.pickupLocation,
-    pickup_rule_id: orderData.pickupRuleId,
-    note: orderData.note || '',
-    total: orderData.total,
-    status: 'pending',
-    items: orderData.items
+  try {
+    const { data, error } = await supabase.rpc('create_order_safe', {
+      p_customer_name: orderData.name,
+      p_customer_phone: orderData.phone,
+      p_pickup_date: orderData.pickupDate,
+      p_pickup_location: orderData.pickupLocation,
+      p_pickup_rule_id: orderData.pickupRuleId || null,
+      p_note: orderData.note || '',
+      p_total: orderData.total,
+      p_items: orderData.items
+    })
+
+    if (error) {
+      // 完整錯誤寫到 console 給工程師看
+      console.error('[createOrder] Supabase error:', error)
+
+      const errMsg = error.message || ''
+
+      // 庫存不足
+      if (errMsg.includes('STOCK_INSUFFICIENT')) {
+        const parts = errMsg.split(':')
+        const productName = parts[1] || '某項商品'
+        const currentStock = parts[2] || '0'
+        throw new OrderError(
+          'STOCK_INSUFFICIENT',
+          `很抱歉,「${productName}」的庫存僅剩 ${currentStock} 份,請返回購物車調整數量後再試。`,
+          error
+        )
+      }
+
+      // 商品不存在
+      if (errMsg.includes('PRODUCT_NOT_FOUND')) {
+        throw new OrderError(
+          'PRODUCT_NOT_FOUND',
+          '購物車中有商品已下架,請重新整理頁面後再試。',
+          error
+        )
+      }
+
+      // 編號產生失敗(理論上不會發生)
+      if (errMsg.includes('ORDER_NO_GENERATE_FAILED')) {
+        throw new OrderError(
+          'ORDER_NO_GENERATE_FAILED',
+          '訂單送出時發生問題,請稍後再試一次,或截圖聯絡我們協助處理。',
+          error
+        )
+      }
+
+      // 其他資料庫錯誤
+      throw new OrderError(
+        'UNKNOWN',
+        '訂單送出時發生問題,請稍後再試一次,或截圖聯絡我們協助處理。',
+        error
+      )
+    }
+
+    // RPC 回傳是陣列,取第一筆
+    const result = Array.isArray(data) ? data[0] : data
+    if (!result) {
+      throw new OrderError('UNKNOWN', '訂單建立失敗,請稍後再試。')
+    }
+
+    // 組回完整訂單物件(因為 RPC 只回傳 id/no/created_at)
+    return {
+      id: result.out_id,
+      orderNo: result.out_order_no,
+      createdAt: result.out_created_at,
+      name: orderData.name,
+      phone: orderData.phone,
+      pickupDate: orderData.pickupDate,
+      pickupLocation: orderData.pickupLocation,
+      pickupRuleId: orderData.pickupRuleId,
+      note: orderData.note || '',
+      total: orderData.total,
+      items: orderData.items,
+      status: 'pending'
+    }
+  } catch (err) {
+    // 已經是 OrderError 直接往外拋
+    if (err instanceof OrderError) throw err
+
+    // 網路錯誤
+    console.error('[createOrder] Network/unexpected error:', err)
+    if (err.message && err.message.includes('Failed to fetch')) {
+      throw new OrderError(
+        'NETWORK',
+        '網路連線不穩,請確認網路狀態後再試一次。',
+        err
+      )
+    }
+
+    throw new OrderError(
+      'UNKNOWN',
+      '訂單送出時發生問題,請稍後再試一次,或截圖聯絡我們協助處理。',
+      err
+    )
   }
-  
-  const { data, error } = await supabase.from('orders').insert(payload).select().single()
-  if (error) throw error
-  
-  for (const item of orderData.items) {
-    await supabase.rpc('decrement_stock', { product_id: item.id, qty: item.qty })
-  }
-  
-  return mapOrder(data)
 }
 
 export async function updateOrderStatus(id, status) {
@@ -159,7 +252,7 @@ export async function deleteMember(phone) {
   if (error) throw error
 }
 
-// ============ 統計分析 ============
+// ============ 統計 ============
 export async function fetchAnalytics() {
   const { data: orders, error } = await supabase.from('orders').select('*').neq('status', 'cancelled')
   if (error) throw error

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import * as api from './lib/api'
 import Browse from './pages/Browse'
 import Checkout from './pages/Checkout'
@@ -135,13 +135,28 @@ export default function App() {
 
   // === 訂單 ===
   async function submitOrder(orderData) {
+    // ⚠️ 注意:這個函式不需要自己做防重複的檢查
+    // 因為 Checkout 元件已經用 submittingRef + state 雙重防護了
+    // 這裡只負責「呼叫 API + 處理結果」
+    
     const order = await api.createOrder(orderData)
+    
+    // 訂單建立成功後:
+    // 1. 重新載入商品(更新庫存顯示)
     await loadProducts()
+    // 2. 重新載入會員(可能有新會員)
     await loadMembers()
+    // 3. 記錄成功的訂單給 Success 頁顯示
     setLastOrder(order)
+    // 4. 清空購物車(避免重新整理或返回上一頁時重複送單)
     setCart([])
+    // 5. 跳到成功頁
     setStage('success')
+    
+    // 如果 createOrder 拋錯,會被 Checkout 的 try/catch 接到,
+    // 顯示友善錯誤訊息,並讓使用者重新送出
   }
+
 
   async function updateOrderStatus(id, status) {
     await api.updateOrderStatus(id, status)
