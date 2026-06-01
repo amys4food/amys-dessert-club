@@ -3,15 +3,10 @@ import CartItem from '../components/CartItem'
 import { getPickupDates, inputStyle, labelStyle } from '../lib/utils'
 
 export default function Checkout({ cart, cartTotal, pickups, settings, onUpdateQty, onRemoveItem, onSubmitOrder, onBack }) {
-  const [form, setForm] = useState({
-    name: '', phone: '',
-    pickupDate: '', pickupLocation: '', pickupRuleId: '',
-    note: ''
-  })
+  const [form, setForm] = useState({ name: '', phone: '', pickupDate: '', pickupLocation: '', pickupRuleId: '', note: '' })
   const [submitting, setSubmitting] = useState(false)
 
   const pickupDates = useMemo(() => getPickupDates(pickups, settings.leadDays), [pickups, settings.leadDays])
-  
   const seen = new Set()
   const groupedDates = []
   pickupDates.forEach(d => {
@@ -27,178 +22,157 @@ export default function Checkout({ cart, cartTotal, pickups, settings, onUpdateQ
     try {
       await onSubmitOrder({ ...form, items: cart, total: cartTotal })
     } catch (err) {
-      alert('訂購失敗: ' + err.message)
+      alert('訂購失敗:' + err.message)
       setSubmitting(false)
     }
   }
 
   return (
-    <div style={{ padding: '32px 28px', background: 'var(--paper)', minHeight: '520px' }}>
-      <button onClick={onBack} className="sans btn-ghost" style={{
-        background: 'transparent', border: 'none', color: 'var(--cocoa)',
-        cursor: 'pointer', fontSize: '13px', marginBottom: '20px',
-        padding: '4px 8px', borderRadius: '4px'
+    <div className="responsive-container" style={{ padding: '24px 16px', background: 'var(--cream-bg)', minHeight: '100vh' }}>
+      <button onClick={onBack} className="fredoka btn-ghost" style={{
+        background: 'transparent', border: 'none', color: 'var(--brown)',
+        cursor: 'pointer', fontSize: '14px', marginBottom: '16px',
+        padding: '6px 10px', borderRadius: '8px', fontWeight: 600
       }}>← 繼續選購</button>
 
-      <div style={{ marginBottom: '28px' }}>
-        <div className="sans" style={{
-          fontSize: '10px', letterSpacing: '3px', color: 'var(--caramel)',
-          fontWeight: 600, marginBottom: '4px'
-        }}>CHECKOUT</div>
-        <h2 className="serif" style={{ fontSize: '26px', margin: 0, color: 'var(--ink)', fontWeight: 400 }}>
-          確認訂購資訊
-        </h2>
-      </div>
+      <h2 className="fredoka" style={{
+        fontSize: '28px', margin: '0 0 4px 0', color: 'var(--blue-dark)', fontWeight: 700
+      }}>CHECKOUT</h2>
+      <div style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '24px' }}>確認訂購資訊</div>
 
       {/* 訂購商品 */}
-      <div style={{
-        background: 'var(--paper)', borderRadius: '10px',
-        border: '1px solid var(--line)', overflow: 'hidden', marginBottom: '24px'
-      }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '14px 20px', background: 'var(--cream)', borderBottom: '1px solid var(--line)'
-        }}>
-          <div>
-            <div className="sans" style={{ fontSize: '10px', letterSpacing: '2.5px', color: 'var(--caramel)', fontWeight: 600 }}>
-              YOUR ORDER
-            </div>
-            <div className="serif" style={{ fontSize: '15px', color: 'var(--ink)', fontWeight: 500, marginTop: '2px' }}>
-              訂購商品 · {cart.reduce((s,i) => s+i.qty, 0)} 件
-            </div>
-          </div>
-          <button onClick={onBack} className="sans btn-ghost" style={{
-            background: 'transparent', border: '1px solid var(--line)', borderRadius: '4px',
-            padding: '6px 12px', fontSize: '11px', color: 'var(--cocoa)',
-            cursor: 'pointer', fontWeight: 500
-          }}>+ 加選</button>
-        </div>
+      <Card title="🛒 訂購商品" subtitle={`共 ${cart.reduce((s,i)=>s+i.qty,0)} 件`}>
         {cart.length === 0 ? (
-          <div className="sans" style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--muted)', fontSize: '13px' }}>
+          <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--muted)', fontSize: '13px' }}>
             <div style={{ fontSize: '32px', marginBottom: '10px', opacity: 0.4 }}>🛒</div>
             <div>購物車是空的</div>
-            <button onClick={onBack} className="btn-primary" style={{
-              marginTop: '16px', padding: '9px 22px',
-              background: 'var(--ink)', color: 'var(--paper)',
-              border: 'none', borderRadius: '5px',
-              fontSize: '12px', fontWeight: 600, cursor: 'pointer', letterSpacing: '1px'
+            <button onClick={onBack} className="fredoka btn-orange" style={{
+              marginTop: '14px', padding: '10px 22px',
+              background: 'var(--orange)', color: '#fff', border: 'none', borderRadius: '999px',
+              fontSize: '13px', fontWeight: 600, cursor: 'pointer'
             }}>去選購甜點</button>
           </div>
         ) : (
-          <div>
+          <>
             {cart.map((i, idx) => (
               <CartItem key={i.id} item={i} isLast={idx === cart.length - 1}
                 onUpdateQty={(delta) => onUpdateQty(i.id, delta)}
                 onRemove={() => onRemoveItem(i.id)} />
             ))}
-            <div className="sans" style={{
-              padding: '16px 20px', background: 'var(--cream)',
+            <div style={{
+              padding: '14px 16px', background: 'var(--cream-light)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              borderTop: '1px solid var(--line)'
+              borderTop: '2px dashed var(--line)'
             }}>
               <div style={{ fontSize: '13px', color: 'var(--muted)' }}>商品合計</div>
-              <div className="serif" style={{ fontSize: '22px', fontWeight: 600, color: 'var(--ink)' }}>
-                NT$ {cartTotal}
+              <div className="fredoka" style={{ fontSize: '24px', fontWeight: 700, color: 'var(--orange-dark)' }}>
+                ${cartTotal}
               </div>
             </div>
-          </div>
+          </>
         )}
-      </div>
+      </Card>
 
       {/* 聯絡資訊 */}
-      <div style={{
-        background: 'var(--paper)', borderRadius: '10px',
-        border: '1px solid var(--line)', padding: '22px 20px', marginBottom: '18px'
-      }}>
-        <div className="sans" style={{ fontSize: '10px', letterSpacing: '2.5px', color: 'var(--caramel)', fontWeight: 600, marginBottom: '14px' }}>
-          CONTACT INFO
+      <Card title="📞 聯絡資訊">
+        <div style={{ padding: '16px' }}>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={labelStyle}>姓名</label>
+            <input style={inputStyle} type="text" value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })}
+              placeholder="請輸入您的姓名" />
+          </div>
+          <div>
+            <label style={labelStyle}>手機號碼</label>
+            <input style={inputStyle} type="tel" value={form.phone}
+              onChange={e => setForm({ ...form, phone: e.target.value })}
+              placeholder="09XXXXXXXX" />
+          </div>
         </div>
-        <div style={{ marginBottom: '14px' }}>
-          <label className="sans" style={labelStyle}>姓名</label>
-          <input className="sans" style={inputStyle} type="text" value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
-            placeholder="請輸入您的姓名" />
-        </div>
-        <div>
-          <label className="sans" style={labelStyle}>手機號碼</label>
-          <input className="sans" style={inputStyle} type="tel" value={form.phone}
-            onChange={e => setForm({ ...form, phone: e.target.value })}
-            placeholder="09XXXXXXXX" />
-        </div>
-      </div>
+      </Card>
 
       {/* 取貨日 */}
-      <div style={{
-        background: 'var(--paper)', borderRadius: '10px',
-        border: '1px solid var(--line)', padding: '22px 20px', marginBottom: '18px'
-      }}>
-        <div className="sans" style={{ fontSize: '10px', letterSpacing: '2.5px', color: 'var(--caramel)', fontWeight: 600, marginBottom: '4px' }}>
-          PICKUP DATE
+      <Card title="📅 取貨日期" subtitle={`需於取貨日 ${settings.leadDays} 天前訂購`}>
+        <div style={{ padding: '14px 16px' }}>
+          {groupedDates.length === 0 ? (
+            <div style={{ padding: '20px', background: 'var(--cream-light)', borderRadius: '12px', fontSize: '12px', color: 'var(--muted)', textAlign: 'center' }}>
+              目前無可預約日期
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: '8px', maxHeight: '260px', overflowY: 'auto', padding: '2px'
+            }}>
+              {groupedDates.map(d => {
+                const selected = form.pickupDate === d.iso && form.pickupRuleId === d.ruleId
+                return (
+                  <button key={d.iso + d.ruleId}
+                    onClick={() => setForm({ ...form, pickupDate: d.iso, pickupLocation: d.location, pickupRuleId: d.ruleId })}
+                    style={{
+                      padding: '12px 14px', borderRadius: '12px',
+                      border: selected ? '2px solid var(--orange)' : '2px solid var(--line)',
+                      background: selected ? '#fff5e9' : '#fff',
+                      cursor: 'pointer', textAlign: 'left', color: 'var(--brown)',
+                      fontFamily: 'inherit'
+                    }}>
+                    <div className="fredoka" style={{ fontWeight: 700, fontSize: '14px' }}>{d.display} {d.dayLabel}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--orange-dark)', marginTop: '3px' }}>{d.location}</div>
+                    {d.note && <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>{d.note}</div>}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
-        <p className="sans" style={{ fontSize: '11px', color: 'var(--muted)', margin: '0 0 12px 0' }}>
-          需於取貨日 {settings.leadDays} 天前訂購
-        </p>
-        {groupedDates.length === 0 ? (
-          <div className="sans" style={{ padding: '20px', background: 'var(--cream)', borderRadius: '6px', fontSize: '12px', color: 'var(--muted)', textAlign: 'center' }}>
-            目前無可預約日期
-          </div>
-        ) : (
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-            gap: '8px', maxHeight: '260px', overflowY: 'auto', padding: '2px'
-          }}>
-            {groupedDates.map(d => {
-              const selected = form.pickupDate === d.iso && form.pickupRuleId === d.ruleId
-              return (
-                <button key={d.iso + d.ruleId}
-                  onClick={() => setForm({ ...form, pickupDate: d.iso, pickupLocation: d.location, pickupRuleId: d.ruleId })}
-                  className="sans"
-                  style={{
-                    padding: '12px 14px', borderRadius: '6px',
-                    border: selected ? '1.5px solid var(--ink)' : '1px solid var(--line)',
-                    background: selected ? 'var(--cream)' : 'var(--paper)',
-                    cursor: 'pointer', textAlign: 'left', color: 'var(--ink)'
-                  }}>
-                  <div style={{ fontWeight: 600, fontSize: '13px' }}>{d.display}  {d.dayLabel}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--caramel)', marginTop: '3px' }}>{d.location}</div>
-                  {d.note && <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>{d.note}</div>}
-                </button>
-              )
-            })}
-          </div>
-        )}
-      </div>
+      </Card>
 
       {/* 備註 */}
-      <div style={{
-        background: 'var(--paper)', borderRadius: '10px',
-        border: '1px solid var(--line)', padding: '22px 20px', marginBottom: '18px'
-      }}>
-        <div className="sans" style={{ fontSize: '10px', letterSpacing: '2.5px', color: 'var(--caramel)', fontWeight: 600, marginBottom: '12px' }}>
-          NOTE (OPTIONAL)
+      <Card title="📝 備註(可選)">
+        <div style={{ padding: '14px 16px' }}>
+          <textarea style={{ ...inputStyle, minHeight: '70px', resize: 'vertical' }}
+            value={form.note} onChange={e => setForm({ ...form, note: e.target.value })}
+            placeholder="如有需求請留言,例如過敏、禮盒包裝等" />
         </div>
-        <textarea className="sans" style={{ ...inputStyle, minHeight: '64px', resize: 'vertical' }}
-          value={form.note} onChange={e => setForm({ ...form, note: e.target.value })}
-          placeholder="如有需求請留言,例如過敏、禮盒包裝等" />
-      </div>
+      </Card>
 
-      <div className="sans" style={{
-        background: 'var(--cream)', borderRadius: '8px',
-        padding: '12px 16px', fontSize: '12px', color: 'var(--cocoa)',
-        marginBottom: '18px', border: '1px solid var(--line)', lineHeight: 1.6
+      <div style={{
+        background: '#fff3d6', borderRadius: '12px',
+        padding: '12px 16px', fontSize: '13px', color: 'var(--brown)',
+        marginBottom: '16px', lineHeight: 1.6, fontWeight: 500
       }}>
         💰 本店採取貨付款,無需先轉帳,取貨時現場付現即可。
       </div>
 
-      <button onClick={handleSubmit} disabled={!canSubmit} className="sans" style={{
-        width: '100%', padding: '14px',
-        background: canSubmit ? 'var(--ink)' : 'var(--soft-muted)',
-        color: 'var(--paper)', border: 'none', borderRadius: '6px',
-        fontSize: '14px', fontWeight: 600,
-        cursor: canSubmit ? 'pointer' : 'not-allowed', letterSpacing: '1.5px'
+      <button onClick={handleSubmit} disabled={!canSubmit} className="fredoka" style={{
+        width: '100%', padding: '16px',
+        background: canSubmit ? 'var(--orange)' : 'var(--soft-muted)',
+        color: '#fff', border: 'none', borderRadius: '999px',
+        fontSize: '16px', fontWeight: 700,
+        cursor: canSubmit ? 'pointer' : 'not-allowed'
       }}>
-        {submitting ? '處理中...' : `確認訂購 · NT$ ${cartTotal}`}
+        {submitting ? '處理中...' : `確認訂購 · $${cartTotal}`}
       </button>
+    </div>
+  )
+}
+
+function Card({ title, subtitle, children }) {
+  return (
+    <div style={{
+      background: 'var(--cream-card)', borderRadius: '20px',
+      overflow: 'hidden', marginBottom: '14px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+    }}>
+      <div style={{
+        padding: '14px 16px', borderBottom: '2px dashed var(--line)',
+        background: 'var(--cream-light)'
+      }}>
+        <div className="fredoka" style={{ fontSize: '15px', fontWeight: 700, color: 'var(--brown)' }}>
+          {title}
+        </div>
+        {subtitle && <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>{subtitle}</div>}
+      </div>
+      {children}
     </div>
   )
 }

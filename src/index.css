@@ -1,61 +1,200 @@
-/* ============ 全域樣式 ============ */
+/* ============ 全新色票 (Pinterest 手繪風) ============ */
 :root {
-  --paper: #fdfaf4;
-  --cream: #f7f0e3;
-  --ivory: #efe5d2;
-  --line: #e6d8c0;
-  --caramel: #a8744a;
-  --cocoa: #6b3e22;
+  --cream-bg: #fef3e1;
+  --cream-light: #fff8eb;
+  --cream-card: #ffffff;
+  --orange: #ff8c42;
+  --orange-dark: #f26a2d;
+  --orange-light: #ffb774;
+  --yellow: #ffd23f;
+  --yellow-light: #ffe680;
+  --blue: #4a89dc;
+  --blue-dark: #2c5aa0;
+  --blue-light: #a8c5e8;
+  --red: #e63946;
+  --red-light: #f08c93;
+  --brown: #5d3a1f;
+  --brown-light: #8a6347;
   --ink: #2d1a10;
-  --brick: #a64232;
-  --brick-dark: #7d2e22;
   --muted: #8a7560;
   --soft-muted: #b8a790;
-  --mint: #8aa890;
+  --line: #f0e2c8;
+  --green: #6bb56b;
+  --pink: #ffb5b5;
+}
+
+html, body { margin: 0; padding: 0; overflow-x: hidden; width: 100%; }
+
+body {
+  font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cream-bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  min-height: 100vh;
 }
 
 * { box-sizing: border-box; }
 
-body {
-  margin: 0;
-  font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--paper);
-  color: var(--ink);
-  -webkit-font-smoothing: antialiased;
-}
-
-.serif { font-family: 'Georgia', 'Noto Serif TC', serif; }
-.sans { font-family: 'Inter', 'Noto Sans TC', sans-serif; }
-.script { font-family: 'Brush Script MT', 'Lucida Handwriting', cursive; font-style: italic; }
+.fredoka { font-family: 'Fredoka', 'Noto Sans TC', sans-serif; }
+.caveat { font-family: 'Caveat', cursive; }
 
 input, textarea, select, button { font-family: inherit; outline: none; }
-input:focus, textarea:focus, select:focus { border-color: var(--caramel) !important; }
 
-.pcard { transition: box-shadow 0.25s ease, transform 0.25s ease; }
-.pcard:hover { box-shadow: 0 8px 24px rgba(45,26,16,0.1); transform: translateY(-2px); }
-
-.btn-primary:hover { background: var(--ink) !important; }
-.btn-ghost:hover { background: rgba(139,90,60,0.08) !important; }
-.qty-btn { transition: background 0.15s ease; }
-.qty-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1) !important; }
-.cart-qty-btn:hover:not(:disabled) { background: var(--ivory) !important; }
-.qty-btn:disabled, .cart-qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.remove-btn:hover { color: var(--brick) !important; }
-
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #d4b896; border-radius: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-
-#root {
-  min-height: 100vh;
-}
+#root { width: 100%; min-height: 100vh; }
 
 .app-container {
+  width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  background: var(--paper);
+  background: var(--cream-bg);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-@media (max-width: 768px) {
-  .app-container { box-shadow: none; }
+/* ============ 卡片 hover ============ */
+.pcard { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.pcard:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(255,140,66,0.15); }
+
+/* ============ 按鈕 hover ============ */
+.btn-orange { transition: background 0.15s ease, transform 0.1s ease; }
+.btn-orange:hover { background: var(--orange-dark) !important; }
+.btn-orange:active { transform: scale(0.97); }
+
+.btn-blue { transition: background 0.15s ease; }
+.btn-blue:hover { background: var(--blue-dark) !important; }
+
+.btn-ghost:hover { background: rgba(255,140,66,0.08) !important; }
+
+.qty-btn { transition: background 0.15s ease; }
+.qty-btn:hover:not(:disabled) { background: rgba(255,255,255,0.15) !important; }
+.qty-btn:disabled, .cart-qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.cart-qty-btn:hover:not(:disabled) { background: var(--cream-light) !important; }
+.remove-btn:hover { color: var(--red) !important; }
+
+/* ============ 手繪虛線框 ============ */
+.dashed-circle {
+  border: 2.5px dashed var(--orange);
+  border-radius: 50%;
+}
+
+/* ============ 滾動條 ============ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--orange-light); border-radius: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ============ 響應式核心:RWD 修復 ============ */
+.responsive-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.scroll-x::-webkit-scrollbar { height: 4px; }
+
+/* ============ 後台 tabs 橫向滑動 ============ */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 16px;
+}
+.admin-tabs::-webkit-scrollbar { display: none; }
+
+/* ============ Modal ============ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(45,26,16,0.55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-box {
+  background: var(--cream-card);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+/* ============ 桌機才顯示 ============ */
+@media (max-width: 640px) {
+  .hide-mobile { display: none !important; }
+}
+@media (min-width: 641px) {
+  .show-mobile { display: none !important; }
+}
+
+/* ============ 手繪裝飾元素 ============ */
+.deco-heart {
+  display: inline-block;
+  width: 24px; height: 24px;
+  color: var(--red);
+}
+
+/* ============ 商品卡 ============ */
+.product-card {
+  background: var(--cream-card);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ============ Hero 區塊 ============ */
+.hero-title {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -1px;
+}
+
+.hero-tag {
+  display: inline-block;
+  background: var(--yellow);
+  color: var(--brown);
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+/* ============ 圓點裝飾 ============ */
+.dots-deco::before {
+  content: '• • •';
+  display: inline-block;
+  color: var(--orange);
+  letter-spacing: 2px;
+  margin-right: 8px;
+}
+
+/* ============ 訂單卡片直式排列 (手機) ============ */
+@media (max-width: 640px) {
+  .order-card-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .order-card-row > div:last-child {
+    text-align: left !important;
+  }
 }

@@ -4,7 +4,6 @@ import { DAY_LABELS } from '../lib/utils'
 export default function Success({ order, settings, onBack }) {
   if (!order) return null
   const dow = new Date(order.pickupDate).getDay()
-  
   const qrText = [
     `【${settings.shopName}】訂購確認`,
     `訂單編號:${order.orderNo}`,
@@ -14,119 +13,112 @@ export default function Success({ order, settings, onBack }) {
     `取貨地點:${order.pickupLocation}`,
     ``,
     `訂購明細:`,
-    ...order.items.map(i => `• ${i.name} × ${i.qty} = NT$${i.price * i.qty}`),
+    ...order.items.map(i => `• ${i.name} × ${i.qty} = $${i.price * i.qty}`),
     ``,
-    `合計:NT$ ${order.total} (取貨付款)`,
+    `合計:$${order.total} (取貨付款)`,
     order.note ? `備註:${order.note}` : '',
     `下單時間:${new Date(order.createdAt).toLocaleString('zh-TW')}`
   ].filter(Boolean).join('\n')
 
   return (
-    <div style={{ padding: '40px 28px', background: 'var(--paper)', minHeight: '520px' }}>
+    <div className="responsive-container" style={{ padding: '32px 20px', background: 'var(--cream-bg)', minHeight: '100vh' }}>
       <div style={{ textAlign: 'center', maxWidth: '480px', margin: '0 auto' }}>
         <div style={{
-          width: '64px', height: '64px', borderRadius: '50%',
-          background: 'var(--mint)', margin: '0 auto 18px',
+          width: '70px', height: '70px', borderRadius: '50%',
+          background: 'var(--green)', margin: '0 auto 16px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '30px', color: 'var(--paper)', fontWeight: 300
+          fontSize: '36px', color: '#fff', fontWeight: 700,
+          boxShadow: '0 8px 20px rgba(107,181,107,0.3)'
         }}>✓</div>
-        <div className="script" style={{ fontSize: '30px', color: 'var(--caramel)', marginBottom: '4px' }}>
-          Thank you
+        <div className="caveat" style={{ fontSize: '36px', color: 'var(--orange-dark)', marginBottom: '4px' }}>
+          Thank you!
         </div>
-        <h2 className="serif" style={{ fontSize: '22px', margin: '0 0 6px 0', color: 'var(--ink)', fontWeight: 400 }}>
+        <h2 className="fredoka" style={{ fontSize: '26px', margin: '0 0 6px 0', color: 'var(--brown)', fontWeight: 700 }}>
           訂購成功
         </h2>
-        <p className="sans" style={{ fontSize: '12px', color: 'var(--muted)', margin: 0 }}>
+        <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0 }}>
           Amy 已收到您的訂單
         </p>
 
         {/* QR Code */}
         <div style={{
-          background: 'var(--paper)', border: '2px solid var(--ink)',
-          borderRadius: '12px', padding: '24px 20px', marginTop: '24px', textAlign: 'center'
+          background: '#fff', border: '3px solid var(--orange)',
+          borderRadius: '20px', padding: '24px 20px', marginTop: '24px'
         }}>
-          <div className="sans" style={{
-            fontSize: '10px', letterSpacing: '3px', color: 'var(--caramel)',
-            fontWeight: 600, marginBottom: '14px'
+          <div className="fredoka" style={{
+            fontSize: '12px', letterSpacing: '2px',
+            color: 'var(--orange-dark)', fontWeight: 700, marginBottom: '14px'
           }}>ORDER QR CODE</div>
-          <div style={{
-            background: '#ffffff', padding: '12px', borderRadius: '8px',
-            display: 'inline-block', marginBottom: '14px'
-          }}>
+          <div style={{ background: '#fff', padding: '8px', borderRadius: '12px', display: 'inline-block', marginBottom: '12px' }}>
             <QRCodeBox text={qrText} size={180} />
           </div>
-          <div className="sans" style={{ fontSize: '12px', color: 'var(--cocoa)', lineHeight: 1.7 }}>
-            <div style={{ fontWeight: 600, marginBottom: '4px', color: 'var(--ink)' }}>
-              請截圖或掃描保存訂購資料
-            </div>
-            <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
-              用手機相機掃描即可查看完整訂單
-            </div>
+          <div style={{ fontSize: '13px', color: 'var(--brown)', lineHeight: 1.7, fontWeight: 600, marginBottom: '4px' }}>
+            請截圖或掃描保存訂購資料
           </div>
-          <div className="sans" style={{
-            marginTop: '14px', padding: '8px 12px',
-            background: 'var(--cream)', borderRadius: '6px',
-            fontSize: '13px', fontWeight: 600, color: 'var(--ink)',
-            fontFamily: 'monospace', letterSpacing: '1px'
+          <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
+            用手機相機掃描即可查看完整訂單
+          </div>
+          <div className="fredoka" style={{
+            marginTop: '14px', padding: '10px 14px',
+            background: 'var(--cream-light)', borderRadius: '12px',
+            fontSize: '15px', fontWeight: 700, color: 'var(--brown)',
+            letterSpacing: '1px'
           }}>{order.orderNo}</div>
         </div>
 
-        {/* 訂單細節 */}
+        {/* 訂單明細 */}
         <div style={{
-          background: 'var(--cream)', borderRadius: '8px',
-          padding: '20px', marginTop: '18px', textAlign: 'left'
+          background: 'var(--cream-light)', borderRadius: '16px',
+          padding: '20px', marginTop: '16px', textAlign: 'left'
         }}>
-          <div className="sans" style={{ fontSize: '10px', letterSpacing: '2.5px', color: 'var(--caramel)', fontWeight: 600, marginBottom: '12px' }}>
-            ORDER DETAILS
-          </div>
+          <div className="fredoka" style={{
+            fontSize: '12px', letterSpacing: '2px',
+            color: 'var(--orange-dark)', fontWeight: 700, marginBottom: '12px'
+          }}>ORDER DETAILS</div>
           {[
-            ['訂購人', order.name],
-            ['聯絡電話', order.phone],
+            ['訂購人', order.name], ['聯絡電話', order.phone],
             ['取貨日期', `${order.pickupDate} (週${DAY_LABELS[dow]})`],
             ['取貨地點', order.pickupLocation]
           ].map(([k, v]) => (
-            <div key={k} className="sans" style={{
-              display: 'flex', justifyContent: 'space-between',
-              padding: '6px 0', fontSize: '13px'
-            }}>
+            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: '13px' }}>
               <span style={{ color: 'var(--muted)' }}>{k}</span>
-              <span style={{ color: 'var(--ink)', fontWeight: 500 }}>{v}</span>
+              <span style={{ color: 'var(--brown)', fontWeight: 600 }}>{v}</span>
             </div>
           ))}
-          <div style={{ borderTop: '1px solid var(--line)', marginTop: '10px', paddingTop: '10px' }}>
+          <div style={{ borderTop: '2px dashed var(--line)', marginTop: '10px', paddingTop: '10px' }}>
             {order.items.map(i => (
-              <div key={i.id} className="sans" style={{
+              <div key={i.id} style={{
                 display: 'flex', justifyContent: 'space-between',
-                fontSize: '12px', padding: '3px 0', color: 'var(--cocoa)'
+                fontSize: '12px', padding: '3px 0', color: 'var(--brown)'
               }}>
                 <span>{i.name} × {i.qty}</span>
-                <span>NT$ {i.price * i.qty}</span>
+                <span>${i.price * i.qty}</span>
               </div>
             ))}
-            <div className="sans" style={{
+            <div className="fredoka" style={{
               display: 'flex', justifyContent: 'space-between',
-              fontSize: '15px', fontWeight: 600, color: 'var(--ink)',
-              marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--line)'
+              fontSize: '17px', fontWeight: 700, color: 'var(--orange-dark)',
+              marginTop: '10px', paddingTop: '10px', borderTop: '2px dashed var(--line)'
             }}>
               <span>合計 · 取貨付款</span>
-              <span>NT$ {order.total}</span>
+              <span>${order.total}</span>
             </div>
           </div>
           {order.note && (
-            <div className="sans" style={{
+            <div style={{
               marginTop: '10px', padding: '8px 10px',
-              background: 'var(--paper)', borderRadius: '5px',
-              fontSize: '12px', color: 'var(--cocoa)', fontStyle: 'italic'
+              background: '#fff', borderRadius: '8px',
+              fontSize: '12px', color: 'var(--brown)', fontStyle: 'italic'
             }}>備註:{order.note}</div>
           )}
         </div>
 
-        <button onClick={onBack} className="sans btn-primary" style={{
-          padding: '12px 32px', background: 'var(--ink)', color: 'var(--paper)',
-          border: 'none', borderRadius: '6px', fontWeight: 600,
-          fontSize: '13px', cursor: 'pointer', marginTop: '20px', letterSpacing: '1px'
+        <button onClick={onBack} className="fredoka btn-orange" style={{
+          padding: '14px 36px', background: 'var(--orange)', color: '#fff',
+          border: 'none', borderRadius: '999px', fontWeight: 700,
+          fontSize: '14px', cursor: 'pointer', marginTop: '22px'
         }}>繼續選購</button>
-        <p className="sans" style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '14px' }}>
+        <p style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '12px' }}>
           👆 請截圖保留此頁面作為訂購憑證
         </p>
       </div>

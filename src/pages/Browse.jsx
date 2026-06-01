@@ -1,135 +1,236 @@
 import ProductCard from '../components/ProductCard'
+import { Heart, Crown, Star, Sparkles, Squiggle, Cloud, Badge } from '../components/HandDrawnDecor'
 
 export default function Browse({ settings, products, pickups, cart, cartTotal, cartCount, onAddToCart, onUpdateQty, onShowDetail, onCheckout }) {
   const activeProducts = products.filter(p => p.active)
 
   return (
-    <div>
-      {/* Hero */}
-      <div style={{
-        padding: '56px 32px 48px',
-        background: `linear-gradient(180deg, var(--paper) 0%, var(--cream) 100%)`,
-        textAlign: 'center', borderBottom: '1px solid var(--line)'
-      }}>
-        <div className="sans" style={{
-          fontSize: '10px', letterSpacing: '4px', color: 'var(--caramel)',
-          fontWeight: 600, marginBottom: '18px', textTransform: 'uppercase'
-        }}>Handmade · Est. 2024</div>
-        <h1 className="serif" style={{
-          fontSize: '42px', fontWeight: 400, margin: '0 0 14px 0',
-          color: 'var(--ink)', letterSpacing: '-1px', lineHeight: 1.1
-        }}>{settings.shopName}</h1>
-        <div style={{ width: '32px', height: '1px', background: 'var(--caramel)', margin: '16px auto' }} />
-        <p className="sans" style={{ fontSize: '13px', color: 'var(--muted)', margin: 0, letterSpacing: '1.5px' }}>
-          {settings.subtitle}
-        </p>
-      </div>
-
-      {/* Story */}
-      <div style={{ padding: '36px 32px', textAlign: 'center', maxWidth: '560px', margin: '0 auto' }}>
-        <p className="sans" style={{ fontSize: '14px', lineHeight: 1.9, color: 'var(--cocoa)', margin: 0 }}>
-          {settings.story}
-        </p>
-      </div>
-
-      {/* Products */}
-      <div style={{ padding: '20px 20px 32px', background: 'var(--cream)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '28px', paddingTop: '16px' }}>
-          <div className="sans" style={{
-            fontSize: '10px', letterSpacing: '3px', color: 'var(--caramel)',
-            fontWeight: 600, marginBottom: '6px'
-          }}>OUR MENU</div>
-          <h2 className="serif" style={{ fontSize: '28px', margin: 0, color: 'var(--ink)', fontWeight: 400 }}>
-            本週手作甜點
-          </h2>
+    <div className="responsive-container">
+      {/* ============ HERO 區塊 ============ */}
+      <div style={{ background: 'var(--cream-bg)', padding: '24px 20px 40px', position: 'relative', overflow: 'hidden' }}>
+        {/* 裝飾:左邊小愛心 */}
+        <div style={{ position: 'absolute', top: '160px', left: '8px', opacity: 0.7 }}>
+          <Heart size={28} color="#4a89dc" />
         </div>
+        {/* 裝飾:右上「Made with love」 */}
+        <div style={{ position: 'absolute', top: '60px', right: '12px', zIndex: 3 }}>
+          <Cloud color="#4a89dc"><span className="fredoka">♡ MADE<br/>WITH LOVE!</span></Cloud>
+        </div>
+
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          {/* 標題 */}
+          <div style={{ position: 'relative', textAlign: 'left', paddingTop: '60px' }}>
+            {/* 星芒裝飾 */}
+            <div style={{ position: 'absolute', top: '40px', left: '-10px' }}>
+              <Sparkles color="#ffd23f" />
+            </div>
+            <div style={{ position: 'absolute', top: '30px', right: '120px' }}>
+              <Sparkles color="#ff8c42" />
+            </div>
+
+            <h1 className="hero-title" style={{
+              fontSize: 'clamp(48px, 14vw, 80px)',
+              margin: 0, color: 'var(--blue-dark)',
+              textShadow: '3px 3px 0 #fff'
+            }}>
+              <span style={{ color: 'var(--blue-dark)' }}>AMY'S</span><br/>
+              <span style={{ color: 'var(--orange-dark)' }}>DESSERT</span><br/>
+              <span style={{ color: 'var(--yellow)', textShadow: '3px 3px 0 #f7c800' }}>CLUB</span>
+            </h1>
+
+            <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+              <span className="hero-tag fredoka">
+                CINNAMON ROLLS · CAKES · GOOD VIBES
+              </span>
+            </div>
+
+            <p style={{
+              fontSize: '14px', color: 'var(--brown)',
+              lineHeight: 1.8, margin: '0 0 28px 0',
+              fontWeight: 500
+            }}>
+              {settings.story}
+            </p>
+
+            <button onClick={() => {
+              document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })
+            }} className="fredoka btn-orange" style={{
+              padding: '14px 32px',
+              background: '#fff', color: 'var(--orange-dark)',
+              border: '2.5px solid var(--orange)',
+              borderRadius: '999px', cursor: 'pointer',
+              fontSize: '15px', fontWeight: 700,
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              boxShadow: '0 4px 12px rgba(255,140,66,0.15)'
+            }}>
+              立即預購 →
+            </button>
+          </div>
+
+          {/* 主視覺圖區 + Badge */}
+          <div style={{ position: 'relative', marginTop: '40px', textAlign: 'center' }}>
+            <div style={{
+              width: '90%', maxWidth: '320px', aspectRatio: '1/1',
+              margin: '0 auto', borderRadius: '50%',
+              background: 'linear-gradient(135deg, #ffe5c4, #ffb774)',
+              border: '3px dashed var(--orange)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '120px', position: 'relative'
+            }}>
+              🥐
+              <div style={{ position: 'absolute', bottom: '0', right: '-10px' }}>
+                <Badge text={`SINCE ${settings.since || '2012'}`} color="#4a89dc" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ============ OUR FAVORITES 區塊 ============ */}
+      <div id="menu-section" style={{
+        background: 'linear-gradient(180deg, var(--cream-bg) 0%, var(--cream-light) 50%, #ffe5c4 100%)',
+        padding: '40px 20px 60px'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{ marginBottom: '8px' }}><Squiggle color="#ff8c42" width={50} /></div>
+          <h2 className="fredoka" style={{
+            fontSize: 'clamp(24px, 6vw, 32px)',
+            margin: '0 0 8px 0', color: 'var(--blue-dark)',
+            fontWeight: 700, letterSpacing: '1px'
+          }}>OUR FAVORITES</h2>
+          <div><Squiggle color="#ff8c42" width={50} /></div>
+        </div>
+
         {activeProducts.length === 0 ? (
-          <div className="sans" style={{ padding: '60px', textAlign: 'center', color: 'var(--muted)' }}>
+          <div style={{ padding: '60px', textAlign: 'center', color: 'var(--muted)' }}>
             目前暫無商品
           </div>
         ) : (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '18px'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+            gap: '16px',
+            maxWidth: '900px',
+            margin: '0 auto'
           }}>
-            {activeProducts.map(p => (
-              <ProductCard key={p.id} product={p} cart={cart}
+            {activeProducts.map((p, idx) => (
+              <ProductCard key={p.id} product={p} index={idx} cart={cart}
                 onAddToCart={onAddToCart} onUpdateQty={onUpdateQty} onShowDetail={onShowDetail} />
             ))}
           </div>
         )}
       </div>
 
-      {/* Sticky Cart Bar */}
+      {/* ============ Sticky Cart Bar ============ */}
       {cart.length > 0 && (
         <div style={{
-          background: 'var(--ink)', color: 'var(--paper)',
-          padding: '16px 22px', position: 'sticky', bottom: 0,
-          boxShadow: '0 -8px 24px rgba(0,0,0,0.12)', zIndex: 20
+          background: 'var(--brown)', color: '#fff',
+          padding: '14px 20px', position: 'sticky', bottom: 0,
+          boxShadow: '0 -8px 24px rgba(0,0,0,0.15)', zIndex: 30
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-            <div className="sans">
-              <div style={{ fontSize: '11px', color: 'var(--soft-muted)', letterSpacing: '1.5px', marginBottom: '2px' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: '12px', maxWidth: '900px', margin: '0 auto'
+          }}>
+            <div className="fredoka">
+              <div style={{ fontSize: '11px', opacity: 0.7, fontWeight: 500 }}>
                 YOUR CART · {cartCount} 件
               </div>
-              <div style={{ fontSize: '20px', fontWeight: 500 }}>NT$ {cartTotal}</div>
+              <div style={{ fontSize: '20px', fontWeight: 700 }}>${cartTotal}</div>
             </div>
-            <button onClick={onCheckout} className="sans btn-primary" style={{
-              padding: '11px 26px', background: 'var(--paper)', color: 'var(--ink)',
-              border: 'none', borderRadius: '6px',
-              fontWeight: 600, fontSize: '13px', cursor: 'pointer', letterSpacing: '0.5px'
-            }}>前往結帳</button>
+            <button onClick={onCheckout} className="fredoka btn-orange" style={{
+              padding: '12px 28px', background: 'var(--orange)', color: '#fff',
+              border: 'none', borderRadius: '999px',
+              fontWeight: 700, fontSize: '14px', cursor: 'pointer'
+            }}>前往結帳 →</button>
           </div>
         </div>
       )}
 
-      {/* How to Order */}
-      <div style={{ padding: '40px 28px', background: 'var(--paper)', borderTop: '1px solid var(--line)' }}>
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div className="sans" style={{
-            fontSize: '10px', letterSpacing: '3px', color: 'var(--caramel)',
-            fontWeight: 600, marginBottom: '6px'
-          }}>HOW TO ORDER</div>
-          <h3 className="serif" style={{ fontSize: '22px', margin: 0, color: 'var(--ink)', fontWeight: 400 }}>
-            訂購與取貨
-          </h3>
-        </div>
-        <div className="sans" style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-          gap: '14px', maxWidth: '620px', margin: '0 auto'
+      {/* ============ OUR STORY + THIS MONTH LIMITED ============ */}
+      <div style={{ background: 'var(--cream-bg)', padding: '40px 20px' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '20px',
+          maxWidth: '900px', margin: '0 auto'
         }}>
-          {[
-            { n: '01', t: '線上下單', d: '選擇喜愛的甜點加入購物車' },
-            { n: '02', t: '預購制', d: `取貨前 ${settings.leadDays} 天截止訂購` },
-            { n: '03', t: '取貨日', d: `${pickups.filter(p => p.active).length} 個固定取貨時段` },
-            { n: '04', t: '取貨付款', d: '取貨時直接付現' }
-          ].map(s => (
-            <div key={s.n} style={{ padding: '20px 14px', textAlign: 'center' }}>
-              <div className="serif" style={{ fontSize: '22px', color: 'var(--caramel)', fontWeight: 300, marginBottom: '10px' }}>
-                {s.n}
-              </div>
-              <div style={{ width: '20px', height: '1px', background: 'var(--line)', margin: '0 auto 10px' }} />
-              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink)', marginBottom: '4px' }}>{s.t}</div>
-              <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.6 }}>{s.d}</div>
+          {/* OUR STORY */}
+          <div style={{
+            background: 'var(--orange)', color: '#fff',
+            borderRadius: '24px', padding: '28px 24px',
+            boxShadow: '0 8px 24px rgba(255,140,66,0.2)'
+          }}>
+            <h3 className="fredoka" style={{
+              fontSize: '24px', margin: '0 0 4px 0', fontWeight: 700, letterSpacing: '1px'
+            }}>OUR STORY</h3>
+            <Squiggle color="#fff" width={50} />
+            <p style={{ fontSize: '14px', lineHeight: 1.8, margin: '14px 0 18px 0' }}>
+              {settings.story}
+            </p>
+            <button className="fredoka btn-orange" style={{
+              padding: '10px 24px', background: '#fff', color: 'var(--orange-dark)',
+              border: 'none', borderRadius: '999px',
+              fontWeight: 600, fontSize: '13px', cursor: 'pointer'
+            }}>了解更多 →</button>
+          </div>
+
+          {/* JOIN OUR CLUB! */}
+          <div style={{
+            background: '#dceefb',
+            borderRadius: '24px', padding: '28px 24px',
+            display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap'
+          }}>
+            <div style={{ flex: '1 1 200px', minWidth: '180px' }}>
+              <h3 className="fredoka" style={{
+                fontSize: '22px', margin: '0 0 8px 0', color: 'var(--blue-dark)', fontWeight: 700
+              }}>JOIN OUR CLUB!</h3>
+              <p style={{ fontSize: '13px', lineHeight: 1.7, color: 'var(--brown)', margin: 0 }}>
+                加入會員,獲得專屬優惠、<br/>生日禮與新品搶先資訊!
+              </p>
             </div>
-          ))}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {settings.contactLine && (
+                <div className="fredoka" style={{
+                  width: '46px', height: '46px', borderRadius: '50%',
+                  background: '#06c755', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '11px', fontWeight: 700
+                }}>LINE</div>
+              )}
+              <div className="fredoka" style={{
+                width: '46px', height: '46px', borderRadius: '50%',
+                background: 'linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '18px'
+              }}>📷</div>
+              <div className="fredoka" style={{
+                width: '46px', height: '46px', borderRadius: '50%',
+                background: '#1877f2', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '18px'
+              }}>f</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div style={{ padding: '28px 28px 24px', background: 'var(--ink)', color: 'var(--paper)', textAlign: 'center' }}>
-        <div className="script" style={{ fontSize: '22px', color: 'var(--paper)', marginBottom: '4px' }}>
-          {settings.shopName}
+      {/* ============ Footer ============ */}
+      <div style={{
+        background: 'var(--cream-light)', padding: '24px 20px',
+        textAlign: 'center', borderTop: '2px dashed var(--line)'
+      }}>
+        <div className="fredoka" style={{ fontSize: '20px', color: 'var(--orange-dark)', marginBottom: '4px', fontWeight: 700 }}>
+          🥐 {settings.shopName}
         </div>
-        <div className="sans" style={{ fontSize: '11px', color: 'var(--soft-muted)', letterSpacing: '1px', marginBottom: '12px' }}>
+        <div style={{ fontSize: '11px', color: 'var(--muted)', marginBottom: '10px' }}>
           {settings.tagline}
         </div>
-        <div className="sans" style={{ fontSize: '11px', color: 'var(--soft-muted)' }}>
+        <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
           {[
             settings.contactLine && `LINE ${settings.contactLine}`,
             settings.contactPhone && `Tel ${settings.contactPhone}`,
-            '© 2025'
+            `© ${new Date().getFullYear()}`
           ].filter(Boolean).join('  ·  ')}
         </div>
       </div>

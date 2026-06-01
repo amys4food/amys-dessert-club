@@ -1,9 +1,8 @@
 {
   "name": "amys-dessert-club",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
-  "description": "Amy's 點心俱樂部 - 線上預購系統",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -13,11 +12,10 @@
     "@supabase/supabase-js": "^2.45.0",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "vite": "^5.4.0"
   }
