@@ -1,27 +1,36 @@
-import { Heart, Crown, Star, Sparkles } from './HandDrawnDecor'
+﻿import { Heart, Crown, Star } from './HandDrawnDecor'
 
 const DECOR_ICONS = [Heart, Crown, Star, Heart]
 const DECOR_COLORS = ['#e63946', '#4a89dc', '#4a89dc', '#ff8c42']
 
-export default function ProductCard({ product, index = 0, cart, onAddToCart, onUpdateQty, onShowDetail }) {
+/**
+ * 商品卡 - 統一版
+ * 
+ * 改動重點:
+ * 1. 拿掉「+ 加入購物車」直接加購按鈕(避免顧客誤點)
+ * 2. 拿掉卡片上的數量加減按鈕(統一在彈窗操作)
+ * 3. 改成「查看詳情」按鈕,點了開啟彈窗
+ * 4. 如果商品已在購物車,顯示「購物車已有 X 份」提示
+ */
+export default function ProductCard({ product, index = 0, cart, onShowDetail }) {
   const soldOut = product.stock <= 0
   const low = product.stock > 0 && product.stock <= 3
   const inCart = cart.find(i => i.id === product.id)
-  const qty = inCart ? inCart.qty : 0
-  const atMax = qty >= product.stock
+  const qtyInCart = inCart ? inCart.qty : 0
 
-  // 為每張卡選一個裝飾圖示
+  // 裝飾圖示
   const DecorIcon = DECOR_ICONS[index % DECOR_ICONS.length]
   const decorColor = DECOR_COLORS[index % DECOR_COLORS.length]
 
   return (
-    <div className="pcard product-card">
-      {/* 手繪裝飾(右上角) */}
+    <div className="pcard product-card" onClick={() => onShowDetail(product)}
+      style={{ cursor: 'pointer' }}>
+      {/* 手繪裝飾 */}
       <div style={{ position: 'absolute', top: '10px', right: '14px', zIndex: 2 }}>
         <DecorIcon size={22} color={decorColor} />
       </div>
 
-      {/* 標籤(左上角) */}
+      {/* 標籤 */}
       {product.tag && !soldOut && (
         <div style={{
           position: 'absolute', top: '10px', left: '10px', zIndex: 2,
@@ -33,12 +42,11 @@ export default function ProductCard({ product, index = 0, cart, onAddToCart, onU
         }}>{product.tag}</div>
       )}
 
-      {/* 商品圖片 */}
-      <div onClick={() => onShowDetail(product)} style={{
+      {/* 圖片 */}
+      <div style={{
         aspectRatio: '1/1', background: 'var(--cream-light)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        position: 'relative', overflow: 'hidden', cursor: 'pointer',
-        padding: '20px'
+        position: 'relative', overflow: 'hidden', padding: '20px'
       }}>
         {product.image
           ? <img src={product.image} alt={product.name} style={{ width: '90%', height: '90%', objectFit: 'cover', borderRadius: '50%' }} />
@@ -70,12 +78,24 @@ export default function ProductCard({ product, index = 0, cart, onAddToCart, onU
             fontWeight: 700
           }}>剩 {product.stock}</div>
         )}
+
+        {/* 已在購物車徽章 */}
+        {qtyInCart > 0 && (
+          <div className="fredoka" style={{
+            position: 'absolute', bottom: '8px', left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'var(--orange)', color: '#fff',
+            fontSize: '10px', fontWeight: 700,
+            padding: '3px 10px', borderRadius: '999px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+          }}>🛒 已加入 {qtyInCart}</div>
+        )}
       </div>
 
       {/* 文字 */}
-      <div onClick={() => onShowDetail(product)} style={{
+      <div style={{
         padding: '14px 16px 12px', flex: 1, display: 'flex', flexDirection: 'column',
-        cursor: 'pointer', textAlign: 'center'
+        textAlign: 'center'
       }}>
         <h3 className="fredoka" style={{
           fontSize: '15px', fontWeight: 600, margin: '0 0 6px 0',
@@ -86,7 +106,7 @@ export default function ProductCard({ product, index = 0, cart, onAddToCart, onU
         }}>${product.price}</div>
       </div>
 
-      {/* 數量增減 / 加入購物車按鈕 */}
+      {/* 統一按鈕:查看詳情 */}
       <div style={{ padding: '0 14px 14px' }}>
         {soldOut ? (
           <div className="fredoka" style={{
@@ -94,39 +114,20 @@ export default function ProductCard({ product, index = 0, cart, onAddToCart, onU
             background: 'var(--cream-light)', color: 'var(--muted)',
             borderRadius: '999px', fontSize: '12px', fontWeight: 600
           }}>已售完</div>
-        ) : qty === 0 ? (
-          <button onClick={() => onAddToCart(product)} className="fredoka btn-orange" style={{
-            width: '100%', padding: '10px',
-            background: 'var(--orange)', color: '#fff',
-            border: 'none', borderRadius: '999px',
-            fontSize: '13px', fontWeight: 600, cursor: 'pointer'
-          }}>+ 加入購物車</button>
         ) : (
-          <div className="fredoka" style={{
-            display: 'flex', alignItems: 'center',
-            background: 'var(--orange)', borderRadius: '999px', overflow: 'hidden'
-          }}>
-            <button onClick={() => onUpdateQty(product.id, -1)} className="qty-btn" style={qtyBtnStyle()}>−</button>
-            <div style={{
-              flex: 1.2, textAlign: 'center', color: '#fff',
-              fontSize: '14px', fontWeight: 700, padding: '10px 0',
-              borderLeft: '1px solid rgba(255,255,255,0.25)',
-              borderRight: '1px solid rgba(255,255,255,0.25)'
-            }}>{qty}</div>
-            <button onClick={() => onUpdateQty(product.id, 1)} className="qty-btn" disabled={atMax}
-              style={{ ...qtyBtnStyle(), cursor: atMax ? 'not-allowed' : 'pointer', opacity: atMax ? 0.4 : 1 }}>+</button>
-          </div>
+          <button onClick={(e) => { e.stopPropagation(); onShowDetail(product) }}
+            className="fredoka btn-orange" style={{
+              width: '100%', padding: '10px',
+              background: qtyInCart > 0 ? '#fff' : 'var(--orange)',
+              color: qtyInCart > 0 ? 'var(--orange-dark)' : '#fff',
+              border: qtyInCart > 0 ? '2px solid var(--orange)' : 'none',
+              borderRadius: '999px',
+              fontSize: '13px', fontWeight: 700, cursor: 'pointer'
+            }}>
+            {qtyInCart > 0 ? '查看 / 加購' : '選擇數量'}
+          </button>
         )}
       </div>
     </div>
   )
-}
-
-function qtyBtnStyle() {
-  return {
-    flex: 1, padding: '10px 0', background: 'transparent',
-    border: 'none', color: '#fff', fontSize: '18px',
-    cursor: 'pointer', fontWeight: 600,
-    display: 'flex', alignItems: 'center', justifyContent: 'center'
-  }
 }

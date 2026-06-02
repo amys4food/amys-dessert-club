@@ -8,9 +8,14 @@ export async function fetchProducts() {
   return (data || []).map(p => ({
     id: p.id, name: p.name, tagline: p.tagline, price: p.price,
     desc: p.description, emoji: p.emoji, image: p.image_url,
-    stock: p.stock, active: p.active, tag: p.tag, displayOrder: p.display_order
+    stock: p.stock, active: p.active, tag: p.tag, displayOrder: p.display_order,
+    // ⭐ 新增的 3 個欄位
+    specs: p.specs || '',
+    storage: p.storage || '',
+    allergens: p.allergens || ''
   }))
 }
+
 
 export async function saveProduct(product) {
   const payload = {
@@ -19,7 +24,11 @@ export async function saveProduct(product) {
     price: product.price, description: product.desc || '',
     emoji: product.emoji || '🍰', image_url: product.image || '',
     stock: product.stock, active: product.active,
-    tag: product.tag || '', display_order: product.displayOrder || 0
+    tag: product.tag || '', display_order: product.displayOrder || 0,
+    // ⭐ 新增的 3 個欄位
+    specs: product.specs || '',
+    storage: product.storage || '',
+    allergens: product.allergens || ''
   }
   const { data, error } = await supabase.from('products').upsert(payload).select().single()
   if (error) throw error

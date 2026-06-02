@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+﻿import { useState, useRef } from 'react'
 import { compressImage, inputStyle, labelStyle } from '../../lib/utils'
 
 export default function AdminProducts({ products, onSaveProduct, onDeleteProduct, onToggleActive }) {
@@ -16,7 +16,8 @@ export default function AdminProducts({ products, onSaveProduct, onDeleteProduct
         </div>
         <button onClick={() => setEditing({
           name: '', tagline: '', price: 0, desc: '',
-          emoji: '🍰', image: '', stock: 0, active: true, tag: ''
+          emoji: '🍰', image: '', stock: 0, active: true, tag: '',
+          specs: '', storage: '', allergens: ''
         })} className="fredoka btn-orange" style={{
           padding: '10px 20px', background: 'var(--orange)', color: '#fff',
           border: 'none', borderRadius: '999px',
@@ -136,6 +137,7 @@ function ProductEditor({ product, onSave, onCancel, onDelete }) {
           }}>✕</button>
         </div>
 
+        {/* 照片 */}
         <div style={{ marginBottom: '14px' }}>
           <label style={labelStyle}>商品照片</label>
           {form.image ? (
@@ -217,7 +219,46 @@ function ProductEditor({ product, onSave, onCancel, onDelete }) {
         <div style={{ marginBottom: '14px' }}>
           <label style={labelStyle}>商品介紹</label>
           <textarea style={{ ...inputStyle, minHeight: '70px', resize: 'vertical' }}
-            value={form.desc} onChange={e => setForm({ ...form, desc: e.target.value })} />
+            value={form.desc} onChange={e => setForm({ ...form, desc: e.target.value })}
+            placeholder="口感、用料、風味描述..." />
+        </div>
+
+        {/* ⭐ 新增的 3 個欄位 */}
+        <div style={{
+          background: 'var(--cream-light)',
+          borderRadius: '12px',
+          padding: '14px',
+          marginBottom: '14px',
+          border: '1px dashed var(--line)'
+        }}>
+          <div className="fredoka" style={{
+            fontSize: '12px', color: 'var(--brown)', fontWeight: 700,
+            marginBottom: '10px', letterSpacing: '0.5px'
+          }}>商品詳細資訊(可選,會顯示在彈窗)</div>
+
+          <div style={{ marginBottom: '10px' }}>
+            <label style={labelStyle}>📏 規格/尺寸</label>
+            <input type="text" style={inputStyle}
+              value={form.specs || ''}
+              onChange={e => setForm({ ...form, specs: e.target.value })}
+              placeholder="例:6 吋圓形 / 8 入禮盒 / 約 200g" />
+          </div>
+
+          <div style={{ marginBottom: '10px' }}>
+            <label style={labelStyle}>🧊 保存方式</label>
+            <input type="text" style={inputStyle}
+              value={form.storage || ''}
+              onChange={e => setForm({ ...form, storage: e.target.value })}
+              placeholder="例:冷藏 7 天,常溫 2 天" />
+          </div>
+
+          <div>
+            <label style={labelStyle}>⚠️ 過敏原</label>
+            <input type="text" style={inputStyle}
+              value={form.allergens || ''}
+              onChange={e => setForm({ ...form, allergens: e.target.value })}
+              placeholder="例:含蛋、奶、麵粉、堅果" />
+          </div>
         </div>
 
         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer', marginBottom: '18px', color: 'var(--brown)' }}>

@@ -104,21 +104,70 @@ export default function App() {
     setTimeout(() => setToast(''), 2000)
   }
 
-  // === 購物車 ===
-  function addToCart(p) {
-    if (p.stock <= 0) { showToast('已售完'); return }
+   // === 購物車 ===
+  /**
+   * 加入購物車
+   * @param {Object} p - 商品
+   * @param {number} qty - 要加入的數量(預設 1)
+   */
+  function addToCart(p, qty = 1) {
+    if (p.stock <= 0) {
+      showToast('商品已售完')
+      return
+    }
+    if (qty < 1) qty = 1
+
     const existing = cart.find(i => i.id === p.id)
+    const currentInCart = existing ? existing.qty : 0
+    const newTotal = currentInCart + qty
+
+    // 庫存檢查
+    if (newTotal > p.stock) {
+      const canAdd = p.stock - currentInCart
+      if (canAdd <= 0) {
+        showToast(`已達庫存上限(${p.stock} 份)`)
+      } else {
+        showToast(`最多只能再加入 ${canAdd} 份`)
+      }
+      return
+    }
+
+    // 更新購物車
     if (existing) {
-      if (existing.qty >= p.stock) { showToast(`庫存僅剩 ${p.stock} 份`); return }
-      setCart(cart.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i))
+      setCart(cart.map(i => i.id === p.id ? { ...i, qty: newTotal } : i))
     } else {
       setCart([...cart, {
         id: p.id, name: p.name, price: p.price,
-        emoji: p.emoji, image: p.image, qty: 1, max: p.stock, tagline: p.tagline
+        emoji: p.emoji, image: p.image,
+        qty: qty, max: p.stock, tagline: p.tagline
       }])
     }
-    showToast('已加入購物車')
+
+    // 友善提示:商品名 × 數量 已加入購物車
+    showToast(`${p.name} × ${qty} 已加入購物車`)
+
+    // 關閉詳細彈窗(如果有開)
+    setDetailProd(null)
   }
+
+
+// =====================================================
+// Browse 元件不需要傳 onAddToCart 和 onUpdateQty 給 ProductCard 了
+// 找到 <Browse ... /> 那段,把 props 簡化(實際上 Browse 內部會傳給 ProductCard)
+//
+// 找到 ProductDetail 元件的呼叫,改成傳新 prop:
+// =====================================================
+
+// 找到 {detailProd && ( ... )} 那段,整段替換成:
+      {detailProd && (
+        <ProductDetail
+          product={detailProd}
+          cart={cart}
+          onClose={() => setDetailProd(null)}
+          onAddToCart={(p, qty) => addToCart(p, qty)}
+        />
+      )}
+
 
   function updateCartQty(id, delta) {
     setCart(cart.map(i => {
