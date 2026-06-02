@@ -38,10 +38,8 @@ export default function App() {
     try { return localStorage.getItem('amy_admin_session') === 'true' } catch { return false }
   })
 
-  // 初始載入
   useEffect(() => { loadAll() }, [])
 
-  // 即時訂閱
   useEffect(() => {
     const unsubscribe = api.subscribeToOrders(async (payload) => {
       if (payload.eventType === 'INSERT' && view === 'admin' && adminLoggedIn) {
@@ -60,7 +58,6 @@ export default function App() {
     return unsubscribe
   }, [view, adminLoggedIn])
 
-  // 進後台請求通知權限
   useEffect(() => {
     if (view === 'admin' && adminLoggedIn && window.Notification && Notification.permission === 'default') {
       Notification.requestPermission()
@@ -104,12 +101,6 @@ export default function App() {
     setTimeout(() => setToast(''), 2000)
   }
 
-   // === 購物車 ===
-  /**
-   * 加入購物車
-   * @param {Object} p - 商品
-   * @param {number} qty - 要加入的數量(預設 1)
-   */
   function addToCart(p, qty = 1) {
     if (p.stock <= 0) {
       showToast('商品已售完')
@@ -121,7 +112,6 @@ export default function App() {
     const currentInCart = existing ? existing.qty : 0
     const newTotal = currentInCart + qty
 
-    // 庫存檢查
     if (newTotal > p.stock) {
       const canAdd = p.stock - currentInCart
       if (canAdd <= 0) {
@@ -132,7 +122,6 @@ export default function App() {
       return
     }
 
-    // 更新購物車
     if (existing) {
       setCart(cart.map(i => i.id === p.id ? { ...i, qty: newTotal } : i))
     } else {
@@ -143,31 +132,9 @@ export default function App() {
       }])
     }
 
-    // 友善提示:商品名 × 數量 已加入購物車
     showToast(`${p.name} × ${qty} 已加入購物車`)
-
-    // 關閉詳細彈窗(如果有開)
     setDetailProd(null)
   }
-
-
-// =====================================================
-// Browse 元件不需要傳 onAddToCart 和 onUpdateQty 給 ProductCard 了
-// 找到 <Browse ... /> 那段,把 props 簡化(實際上 Browse 內部會傳給 ProductCard)
-//
-// 找到 ProductDetail 元件的呼叫,改成傳新 prop:
-// =====================================================
-
-// 找到 {detailProd && ( ... )} 那段,整段替換成:
-      {detailProd && (
-        <ProductDetail
-          product={detailProd}
-          cart={cart}
-          onClose={() => setDetailProd(null)}
-          onAddToCart={(p, qty) => addToCart(p, qty)}
-        />
-      )}
-
 
   function updateCartQty(id, delta) {
     setCart(cart.map(i => {
@@ -182,30 +149,14 @@ export default function App() {
 
   function removeItem(id) { setCart(cart.filter(i => i.id !== id)); showToast('已移除') }
 
-  // === 訂單 ===
   async function submitOrder(orderData) {
-    // ⚠️ 注意:這個函式不需要自己做防重複的檢查
-    // 因為 Checkout 元件已經用 submittingRef + state 雙重防護了
-    // 這裡只負責「呼叫 API + 處理結果」
-    
     const order = await api.createOrder(orderData)
-    
-    // 訂單建立成功後:
-    // 1. 重新載入商品(更新庫存顯示)
     await loadProducts()
-    // 2. 重新載入會員(可能有新會員)
     await loadMembers()
-    // 3. 記錄成功的訂單給 Success 頁顯示
     setLastOrder(order)
-    // 4. 清空購物車(避免重新整理或返回上一頁時重複送單)
     setCart([])
-    // 5. 跳到成功頁
     setStage('success')
-    
-    // 如果 createOrder 拋錯,會被 Checkout 的 try/catch 接到,
-    // 顯示友善錯誤訊息,並讓使用者重新送出
   }
-
 
   async function updateOrderStatus(id, status) {
     await api.updateOrderStatus(id, status)
@@ -219,7 +170,6 @@ export default function App() {
     showToast('已刪除訂單')
   }
 
-  // === 商品 ===
   async function saveProduct(product) {
     await api.saveProduct(product)
     await loadProducts()
@@ -233,7 +183,6 @@ export default function App() {
     await loadProducts()
   }
 
-  // === 取貨日 ===
   async function savePickup(pickup) {
     await api.savePickup(pickup)
     setPickups(await api.fetchPickups())
@@ -245,13 +194,11 @@ export default function App() {
     showToast('已刪除')
   }
 
-  // === 設定 ===
   async function saveSettings(newSettings) {
     await api.saveSettings(newSettings)
     setSettings(newSettings)
   }
 
-  // === 會員 ===
   async function updateMember(phone, updates) {
     await api.updateMember(phone, updates)
     await loadMembers()
@@ -263,7 +210,6 @@ export default function App() {
     showToast('已刪除會員')
   }
 
-  // === 登入 ===
   function adminLogin() {
     setAdminLoggedIn(true)
     try { localStorage.setItem('amy_admin_session', 'true') } catch {}
@@ -296,7 +242,6 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* 頂部導覽 */}
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '12px 18px',
@@ -320,35 +265,66 @@ export default function App() {
       <Toast message={toast} />
 
       {view === 'customer' && stage === 'browse' && (
-        <Browse settings={settings} products={products} pickups={pickups}
-          cart={cart} cartTotal={cartTotal} cartCount={cartCount}
-          onAddToCart={addToCart} onUpdateQty={updateCartQty}
-          onShowDetail={setDetailProd} onCheckout={() => setStage('checkout')} />
+        <Browse
+          settings={settings}
+          products={products}
+          pickups={pickups}
+          cart={cart}
+          cartTotal={cartTotal}
+          cartCount={cartCount}
+          onShowDetail={setDetailProd}
+          onCheckout={() => setStage('checkout')}
+        />
       )}
       {view === 'customer' && stage === 'checkout' && (
-        <Checkout cart={cart} cartTotal={cartTotal} pickups={pickups} settings={settings}
-          onUpdateQty={updateCartQty} onRemoveItem={removeItem}
-          onSubmitOrder={submitOrder} onBack={() => setStage('browse')} />
+        <Checkout
+          cart={cart}
+          cartTotal={cartTotal}
+          pickups={pickups}
+          settings={settings}
+          onUpdateQty={updateCartQty}
+          onRemoveItem={removeItem}
+          onSubmitOrder={submitOrder}
+          onBack={() => setStage('browse')}
+        />
       )}
       {view === 'customer' && stage === 'success' && (
-        <Success order={lastOrder} settings={settings}
-          onBack={() => { setStage('browse'); setLastOrder(null) }} />
+        <Success
+          order={lastOrder}
+          settings={settings}
+          onBack={() => { setStage('browse'); setLastOrder(null) }}
+        />
       )}
       {view === 'admin' && (
-        <Admin products={products} orders={orders} pickups={pickups} settings={settings} members={members}
-          loggedIn={adminLoggedIn} onLogin={adminLogin} onLogout={adminLogout}
-          onSaveProduct={saveProduct} onDeleteProduct={deleteProduct} onToggleProductActive={toggleProductActive}
-          onSavePickup={savePickup} onDeletePickup={deletePickup}
-          onUpdateOrderStatus={updateOrderStatus} onDeleteOrder={deleteOrder}
+        <Admin
+          products={products}
+          orders={orders}
+          pickups={pickups}
+          settings={settings}
+          members={members}
+          loggedIn={adminLoggedIn}
+          onLogin={adminLogin}
+          onLogout={adminLogout}
+          onSaveProduct={saveProduct}
+          onDeleteProduct={deleteProduct}
+          onToggleProductActive={toggleProductActive}
+          onSavePickup={savePickup}
+          onDeletePickup={deletePickup}
+          onUpdateOrderStatus={updateOrderStatus}
+          onDeleteOrder={deleteOrder}
           onSaveSettings={saveSettings}
-          onUpdateMember={updateMember} onDeleteMember={deleteMember} />
+          onUpdateMember={updateMember}
+          onDeleteMember={deleteMember}
+        />
       )}
 
       {detailProd && (
-        <ProductDetail product={detailProd} cart={cart}
+        <ProductDetail
+          product={detailProd}
+          cart={cart}
           onClose={() => setDetailProd(null)}
-          onAdd={() => addToCart(detailProd)}
-          onUpdateQty={(delta) => updateCartQty(detailProd.id, delta)} />
+          onAddToCart={(p, qty) => addToCart(p, qty)}
+        />
       )}
     </div>
   )
